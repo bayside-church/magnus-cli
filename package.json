@@ -1,0 +1,42 @@
+{
+  "name": "magnus-cli",
+  "version": "1.0.0",
+  "description": "Command line tool to pull and push source code files from a Rock RMS server",
+  "main": "dist/index.js",
+  "bin": {
+    "magnus": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsc --watch",
+    "lint": "eslint src --ext .ts",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "rock",
+    "rockrms",
+    "cli"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "1.6.2",
+    "chalk": "4.1.2",
+    "commander": "11.1.0",
+    "conf": "13.1.0",
+    "dotenv": "16.3.1",
+    "inquirer": "8.2.6",
+    "ora": "5.4.1"
+  },
+  "devDependencies": {
+    "@types/inquirer": "8.2.10",
+    "@types/node": "20.9.0",
+    "@typescript-eslint/eslint-plugin": "6.11.0",
+    "@typescript-eslint/parser": "6.11.0",
+    "eslint": "8.53.0",
+    "typescript": "5.2.2"
+  },
+  "type": "module",
+  "packageManager": "pnpm@8.15.1"
+}
