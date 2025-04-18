@@ -1,28 +1,11 @@
 import chalk from 'chalk';
 import ora from 'ora';
+import { RockFile } from '../types/index.js';
 import { listFiles as fetchFilesList } from '../utils/api.js';
 import { isAuthenticated } from '../utils/config.js';
-import { RockFile } from '../types/index.js';
 
 /**
- * Format file size in a human-readable way
- * @param {number} size - File size in bytes
- * @returns {string} Formatted file size
- */
-function formatFileSize(size: number): string {
-  if (size < 1024) {
-    return `${size} B`;
-  } else if (size < 1024 * 1024) {
-    return `${(size / 1024).toFixed(1)} KB`;
-  } else if (size < 1024 * 1024 * 1024) {
-    return `${(size / (1024 * 1024)).toFixed(1)} MB`;
-  } else {
-    return `${(size / (1024 * 1024 * 1024)).toFixed(1)} GB`;
-  }
-}
-
-/**
- * List files from Rock RMS
+ * List items from Rock RMS
  * @param {string} directoryPath - Path to the directory on the server
  * @returns {Promise<void>}
  */
@@ -31,37 +14,41 @@ export async function listFiles(directoryPath = '/'): Promise<void> {
     throw new Error('Not authenticated. Run "magnus config" first.');
   }
 
-  const spinner = ora(`Listing files in ${directoryPath}...`).start();
-  
+  const spinner = ora(`Listing items in ${directoryPath}...`).start();
+
   try {
     // Fetch files list from server
-    const files = await fetchFilesList(directoryPath);
-    spinner.succeed(`Found ${files.length} items in ${directoryPath}`);
+    const items = await fetchFilesList(directoryPath);
+    spinner.succeed(`Found ${items.length} items in ${directoryPath}`);
 
-    if (files.length === 0) {
-      console.log(chalk.yellow('No files found in this directory.'));
+    if (items.length === 0) {
+      console.log(chalk.yellow('No items found in this directory.'));
       return;
     }
 
-    // Sort files: directories first, then by name
-    const sortedFiles = [...files].sort((a: RockFile, b: RockFile) => {
-      if (a.IsDirectory !== b.IsDirectory) {
-        return a.IsDirectory ? -1 : 1;
+    // Sort items: directories first, then by name
+    const sortedItems = [...items].sort((a: RockFile, b: RockFile) => {
+      if (a.IsFolder !== b.IsFolder) {
+        return a.IsFolder ? -1 : 1;
       }
-      return a.Name.localeCompare(b.Name);
+      return a.DisplayName.localeCompare(b.DisplayName);
     });
 
     // Print directories
-    sortedFiles.filter(file => file.IsDirectory).forEach(dir => {
-      console.log(chalk.blue(`📁 ${dir.Name}/`));
-    });
+    sortedItems
+      .filter((item) => item.IsFolder)
+      .forEach((dir) => {
+        console.log(chalk.blue(`📁 ${dir.DisplayName} (${chalk.gray(dir.Uri)})`));
+      });
 
     // Print files
-    sortedFiles.filter(file => !file.IsDirectory).forEach(file => {
-      console.log(`📄 ${chalk.green(file.Name)} ${chalk.gray(`(${formatFileSize(file.Size)})`)}`);
-    });
+    sortedItems
+      .filter((item) => !item.IsFolder)
+      .forEach((file) => {
+        console.log(`📄 ${chalk.green(file.DisplayName)} (${chalk.gray(file.Uri)}))`);
+      });
   } catch (error) {
-    spinner.fail(`Failed to list files: ${error instanceof Error ? error.message : String(error)}`);
+    spinner.fail(`Failed to list items: ${error instanceof Error ? error.message : String(error)}`);
     throw error;
   }
-} 
+}

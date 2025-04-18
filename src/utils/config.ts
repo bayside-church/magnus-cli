@@ -7,7 +7,8 @@ const config = new Conf({
   defaults: {
     serverUrl: '',
     username: '',
-    password: ''
+    password: '',
+    cookie: ''
   }
 }) as Conf<Config>;
 

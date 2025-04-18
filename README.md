@@ -44,7 +44,7 @@ You will be prompted to enter:
 - Username
 - Password
 
-### List files from Rock RMS
+### List items from Rock RMS
 
 List files and directories on the Rock RMS server:
 

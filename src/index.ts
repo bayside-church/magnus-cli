@@ -59,12 +59,12 @@ program
 
 program
   .command('list [directoryPath]')
-  .description('List available files on Rock RMS server')
+  .description('List available items on Rock RMS server')
   .action(async (directoryPath = '/') => {
     try {
       await listFiles(directoryPath);
     } catch (error) {
-      console.error(chalk.red(`Error listing files: ${error instanceof Error ? error.message : String(error)}`));
+      console.error(chalk.red(`Error listing items: ${error instanceof Error ? error.message : String(error)}`));
       process.exit(1);
     }
   });

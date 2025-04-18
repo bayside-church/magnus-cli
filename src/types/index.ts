@@ -5,16 +5,17 @@ export interface Config {
   serverUrl: string;
   username: string;
   password: string;
+  cookie: string;
 }
 
 /**
  * Rock RMS file interface
  */
 export interface RockFile {
-  Name: string;
-  Size: number;
-  IsDirectory: boolean;
-  ModifiedDateTime: string;
+  DisplayName: string;
+  Uri: string;
+  IsFolder: boolean;
+  Icon: string;
 }
 
 /**
@@ -32,4 +33,4 @@ export interface ApiResponse<T> {
 export interface FileSaveRequest {
   fileName: string;
   content: string;
-} 
+}
