@@ -1,13 +1,12 @@
 #!/usr/bin/env node
 
+import chalk from 'chalk';
 import { program } from 'commander';
 import dotenv from 'dotenv';
-import chalk from 'chalk';
 import inquirer from 'inquirer';
-import { pullFile } from './commands/pull.js';
-import { pushFile } from './commands/push.js';
 import { listFiles } from './commands/list.js';
-import { setConfig, getConfig } from './utils/config.js';
+import { pullFile } from './commands/pull.js';
+import { getConfig, setConfig } from './utils/config.js';
 
 dotenv.config();
 
@@ -15,7 +14,7 @@ const VERSION = '1.0.0';
 
 program
   .name('magnus')
-  .description('Command line tool to pull and push source code files from a Rock RMS server')
+  .description('Command line tool to pull source code files from a Rock RMS server')
   .version(VERSION);
 
 program
@@ -27,20 +26,20 @@ program
         type: 'input',
         name: 'serverUrl',
         message: 'Rock RMS server URL:',
-        default: getConfig('serverUrl') || 'https://rock.example.org'
+        default: getConfig('serverUrl') || 'https://rock.example.org',
       },
       {
         type: 'input',
         name: 'username',
         message: 'Username:',
-        default: getConfig('username') || ''
+        default: getConfig('username') || '',
       },
       {
         type: 'password',
         name: 'password',
         message: 'Password:',
-        mask: '*'
-      }
+        mask: '*',
+      },
     ]);
 
     // Process answers and set configuration values
@@ -64,7 +63,9 @@ program
     try {
       await listFiles(directoryPath);
     } catch (error) {
-      console.error(chalk.red(`Error listing items: ${error instanceof Error ? error.message : String(error)}`));
+      console.error(
+        chalk.red(`Error listing items: ${error instanceof Error ? error.message : String(error)}`)
+      );
       process.exit(1);
     }
   });
@@ -78,23 +79,11 @@ program
       await pullFile(filePath, options.output);
       console.log(chalk.green(`Successfully pulled file: ${filePath}`));
     } catch (error) {
-      console.error(chalk.red(`Error pulling file: ${error instanceof Error ? error.message : String(error)}`));
+      console.error(
+        chalk.red(`Error pulling file: ${error instanceof Error ? error.message : String(error)}`)
+      );
       process.exit(1);
     }
   });
 
-program
-  .command('push <filePath>')
-  .description('Push a file to Rock RMS server')
-  .option('-t, --target <targetPath>', 'Target path on the server')
-  .action(async (filePath, options) => {
-    try {
-      await pushFile(filePath, options.target);
-      console.log(chalk.green(`Successfully pushed file: ${filePath}`));
-    } catch (error) {
-      console.error(chalk.red(`Error pushing file: ${error instanceof Error ? error.message : String(error)}`));
-      process.exit(1);
-    }
-  });
-
-program.parse(process.argv); 
+program.parse(process.argv);

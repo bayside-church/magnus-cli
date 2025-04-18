@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
-import { FileSaveRequest, RockFile } from '../types/index.js';
+import { RockFile } from '../types/index.js';
 import { getConfig, setConfig } from './config.js';
 
 /**
@@ -26,22 +26,6 @@ export async function createApiClient(): Promise<AxiosInstance> {
     },
   });
 
-  // // Add response interceptor for error handling
-  // client.interceptors.response.use(
-  //   (response) => response,
-  //   (error) => {
-  //     if (error.response) {
-  //       if (error.response.status === 401) {
-  //         throw new Error('Authentication failed. Please check your credentials.');
-  //       }
-  //       if (error.response.data && error.response.data.Message) {
-  //         throw new Error(`Server error: ${error.response.data.Message}`);
-  //       }
-  //     }
-  //     throw error;
-  //   }
-  // );
-
   return client;
 }
 
@@ -55,22 +39,6 @@ export async function getFileContent(filePath: string): Promise<string> {
   const endpoint = `api/Files/GetContent?fileName=${encodeURIComponent(filePath)}`;
   const response: AxiosResponse<string> = await client.get(endpoint);
   return response.data;
-}
-
-/**
- * Update file content on Rock RMS
- * @param {string} filePath - Path to the file on the server
- * @param {string} content - New file content
- * @returns {Promise<void>}
- */
-export async function updateFileContent(filePath: string, content: string): Promise<void> {
-  const client = await createApiClient();
-  const endpoint = 'api/Files/SaveContent';
-  const payload: FileSaveRequest = {
-    fileName: filePath,
-    content: content,
-  };
-  await client.post(endpoint, payload);
 }
 
 /**

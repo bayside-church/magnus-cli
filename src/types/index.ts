@@ -26,11 +26,3 @@ export interface ApiResponse<T> {
   status: number;
   statusText: string;
 }
-
-/**
- * File save request interface
- */
-export interface FileSaveRequest {
-  fileName: string;
-  content: string;
-}

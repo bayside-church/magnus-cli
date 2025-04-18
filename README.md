@@ -1,6 +1,6 @@
 # Magnus CLI
 
-A command-line tool to pull and push source code files from a Rock RMS server, built with TypeScript.
+A command-line tool to pull source code files from a Rock RMS server, built with TypeScript.
 
 ## Installation
 
@@ -40,6 +40,7 @@ magnus config
 ```
 
 You will be prompted to enter:
+
 - Rock RMS server URL
 - Username
 - Password
@@ -72,20 +73,6 @@ Specify an output path (optional):
 magnus pull "~/Themes/MyTheme/Styles/theme.scss" -o "./local/theme.scss"
 ```
 
-### Push a file to Rock RMS
-
-Push a local file to the Rock RMS server:
-
-```bash
-magnus push "./local/theme.scss"
-```
-
-Specify a target path on the server (optional):
-
-```bash
-magnus push "./local/theme.scss" -t "~/Themes/MyTheme/Styles/theme.scss"
-```
-
 ## License
 
-MIT 
+MIT
