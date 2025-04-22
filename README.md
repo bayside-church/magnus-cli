@@ -45,6 +45,22 @@ You will be prompted to enter:
 - Username
 - Password
 
+### Change Directory
+
+Navigate through directories on the Rock RMS server and set your current working directory:
+
+```bash
+magnus cd /Themes
+```
+
+This command:
+
+1. Changes your current directory on the server
+2. Stores the path in a local `.magnus` file in your current directory
+3. Lists the contents of the directory
+
+The stored directory is used as the default for the `list` command when no path is specified.
+
 ### List items from Rock RMS
 
 List files and directories on the Rock RMS server:
@@ -52,6 +68,8 @@ List files and directories on the Rock RMS server:
 ```bash
 magnus list
 ```
+
+When run without an argument, the list command uses your current directory (set with `cd`).
 
 Specify a specific directory to list:
 

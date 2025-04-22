@@ -2,6 +2,8 @@ import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { RockFile } from '../types/index.js';
 import { getConfig, setConfig } from './config.js';
 
+export const MAGNUS_PATH = 'api/TriumphTech/Magnus/GetTreeItems/';
+
 /**
  * Creates an authenticated API client for Rock RMS
  * @returns {AxiosInstance} API client
@@ -46,9 +48,10 @@ export async function getFileContent(filePath: string): Promise<string> {
  * @param {string} directoryPath - Path to the directory on the server
  * @returns {Promise<RockFile[]>} List of files
  */
-export async function listFiles(directoryPath = '/'): Promise<RockFile[]> {
+export async function listFiles(directoryPath = 'root'): Promise<RockFile[]> {
   const client = await createApiClient();
-  const endpoint = `api/TriumphTech/Magnus/GetTreeItems/root${encodeURIComponent(directoryPath)}`;
+
+  const endpoint = `${MAGNUS_PATH}${directoryPath}`;
   const response: AxiosResponse<RockFile[]> = await client.get(endpoint);
   return response.data;
 }

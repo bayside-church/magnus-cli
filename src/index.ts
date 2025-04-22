@@ -4,6 +4,7 @@ import chalk from 'chalk';
 import { program } from 'commander';
 import dotenv from 'dotenv';
 import inquirer from 'inquirer';
+import { changeDirectory, getCurrentDirectory } from './commands/cd.js';
 import { listFiles } from './commands/list.js';
 import { pullFile } from './commands/pull.js';
 import { getConfig, setConfig } from './utils/config.js';
@@ -57,10 +58,30 @@ program
   });
 
 program
+  .command('cd [directoryPath]')
+  .description('Change current directory on the Rock RMS server')
+  .action(async (directoryPath = 'root') => {
+    try {
+      await changeDirectory(directoryPath);
+    } catch (error) {
+      console.error(
+        chalk.red(
+          `Error changing directory: ${error instanceof Error ? error.message : String(error)}`
+        )
+      );
+      process.exit(1);
+    }
+  });
+
+program
   .command('list [directoryPath]')
   .description('List available items on Rock RMS server')
-  .action(async (directoryPath = '/') => {
+  .action(async (directoryPath) => {
     try {
+      // If no directoryPath is provided, use the current directory from the local config
+      if (!directoryPath) {
+        directoryPath = await getCurrentDirectory();
+      }
       await listFiles(directoryPath);
     } catch (error) {
       console.error(

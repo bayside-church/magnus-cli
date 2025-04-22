@@ -1,7 +1,7 @@
 import chalk from 'chalk';
 import ora from 'ora';
 import { RockFile } from '../types/index.js';
-import { listFiles as fetchFilesList } from '../utils/api.js';
+import { listFiles as fetchFilesList, MAGNUS_PATH } from '../utils/api.js';
 import { isAuthenticated } from '../utils/config.js';
 
 /**
@@ -9,7 +9,7 @@ import { isAuthenticated } from '../utils/config.js';
  * @param {string} directoryPath - Path to the directory on the server
  * @returns {Promise<void>}
  */
-export async function listFiles(directoryPath = '/'): Promise<void> {
+export async function listFiles(directoryPath: string): Promise<void> {
   if (!isAuthenticated()) {
     throw new Error('Not authenticated. Run "magnus config" first.');
   }
@@ -35,18 +35,21 @@ export async function listFiles(directoryPath = '/'): Promise<void> {
     });
 
     // Print directories
-    sortedItems
-      .filter((item) => item.IsFolder)
-      .forEach((dir) => {
-        console.log(chalk.blue(`📁 ${dir.DisplayName} (${chalk.gray(dir.Uri)})`));
+    const directories = sortedItems.filter((item) => item.IsFolder);
+    if (directories.length > 0) {
+      directories.forEach((dir) => {
+        console.log(chalk.blue(`📁 ${dir.Uri.replace(MAGNUS_PATH, '')}`));
       });
+    }
 
     // Print files
-    sortedItems
-      .filter((item) => !item.IsFolder)
-      .forEach((file) => {
-        console.log(`📄 ${chalk.green(file.DisplayName)} (${chalk.gray(file.Uri)}))`);
+    const files = sortedItems.filter((item) => !item.IsFolder);
+    if (files.length > 0) {
+      console.log(chalk.green('\nFiles:'));
+      files.forEach((file) => {
+        console.log(`📄 ${chalk.green(file.Uri.replace(MAGNUS_PATH, ''))}`);
       });
+    }
   } catch (error) {
     spinner.fail(`Failed to list items: ${error instanceof Error ? error.message : String(error)}`);
     throw error;
