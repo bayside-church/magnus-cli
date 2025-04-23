@@ -34,13 +34,17 @@ export async function createApiClient(): Promise<AxiosInstance> {
 /**
  * Get file content from Rock RMS
  * @param {string} filePath - Path to the file on the server
- * @returns {Promise<string>} File content
+ * @returns {Promise<Uint8Array>} File content
  */
-export async function getFileContent(filePath: string): Promise<string> {
+export async function getFileContent(filePath: string): Promise<Uint8Array> {
   const client = await createApiClient();
-  const endpoint = `api/Files/GetContent?fileName=${encodeURIComponent(filePath)}`;
-  const response: AxiosResponse<string> = await client.get(endpoint);
-  return response.data;
+  const endpoint = `${filePath}`;
+
+  const response = await client.get<ArrayBuffer>(endpoint, {
+    responseType: 'arraybuffer',
+  });
+
+  return new Uint8Array(response.data);
 }
 
 /**
