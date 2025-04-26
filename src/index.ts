@@ -6,7 +6,7 @@ import dotenv from 'dotenv';
 import inquirer from 'inquirer';
 import { changeDirectory, getCurrentDirectory } from './commands/cd.js';
 import { listFiles } from './commands/list.js';
-import { pullFile } from './commands/pull.js';
+import { pullFile, pullPath } from './commands/pull.js';
 import { getConfig, setConfig } from './utils/config.js';
 
 dotenv.config();
@@ -92,13 +92,12 @@ program
   });
 
 program
-  .command('pull <filePath>')
-  .description('Pull a file from Rock RMS server')
-  .option('-o, --output <outputPath>', 'Output file path')
-  .action(async (filePath, options) => {
+  .command('pull [path]')
+  .description('Pull a file or directory from Rock RMS server to the current directory')
+  .action(async (path) => {
     try {
-      await pullFile(filePath, options.output);
-      console.log(chalk.green(`Successfully pulled file: ${filePath}`));
+      await pullPath(path);
+      console.log(chalk.green(`Successfully pulled: ${path}`));
     } catch (error) {
       console.error(
         chalk.red(`Error pulling file: ${error instanceof Error ? error.message : String(error)}`)

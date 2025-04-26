@@ -1,8 +1,31 @@
 import fs from 'fs/promises';
-import path from 'path';
 import ora from 'ora';
-import { getFileContent } from '../utils/api.js';
+import path from 'path';
+import { getFileContent, listFiles } from '../utils/api.js';
 import { isAuthenticated } from '../utils/config.js';
+import { getCurrentDirectory } from './cd.js';
+
+export async function pullPath(pullPath: string): Promise<void> {
+  if (!isAuthenticated()) {
+    throw new Error('Not authenticated. Run "magnus config" first.');
+  }
+
+  if (!pullPath) {
+    const currentDirectory = await getCurrentDirectory();
+    console.log(currentDirectory);
+    const items = await listFiles(currentDirectory);
+
+    for (const item of items) {
+      if (item.IsFolder) {
+        console.log(item.DisplayName);
+      } else {
+        pullFile(item.Uri);
+      }
+    }
+
+    return;
+  }
+}
 
 /**
  * Pull a file from Rock RMS and save it locally
