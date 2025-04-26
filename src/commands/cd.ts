@@ -2,7 +2,7 @@ import chalk from 'chalk';
 import fs from 'fs/promises';
 import ora from 'ora';
 import path from 'path';
-import { listFiles } from '../utils/api.js';
+import { listFiles, MAGNUS_PATH } from '../utils/api.js';
 import { isAuthenticated } from '../utils/config.js';
 
 // Local configuration file name
@@ -46,7 +46,11 @@ export async function changeDirectory(directoryPath: string): Promise<void> {
       if (dirs.length > 0) {
         console.log(chalk.blue('\n  Directories:'));
         dirs.forEach((dir) => {
-          console.log(chalk.blue(`  📁 ${dir.DisplayName}`));
+          console.log(
+            chalk.blue(
+              `  📁 ${dir.Uri.replace(MAGNUS_PATH, '')} ${chalk.gray(`(${dir.DisplayName})`)}`
+            )
+          );
         });
       }
 
@@ -55,7 +59,7 @@ export async function changeDirectory(directoryPath: string): Promise<void> {
       if (files.length > 0) {
         console.log(chalk.green('\n  Files:'));
         files.forEach((file) => {
-          console.log(chalk.green(`  📄 ${file.DisplayName}`));
+          console.log(chalk.green(`  📄 ${file.Uri} ${chalk.gray(`(${file.DisplayName})`)}`));
         });
       }
     }

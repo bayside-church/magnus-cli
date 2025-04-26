@@ -38,7 +38,9 @@ export async function listFiles(directoryPath: string): Promise<void> {
     const directories = sortedItems.filter((item) => item.IsFolder);
     if (directories.length > 0) {
       directories.forEach((dir) => {
-        console.log(chalk.blue(`📁 ${dir.Uri.replace(MAGNUS_PATH, '')}`));
+        console.log(
+          chalk.blue(`📁 ${dir.Uri.replace(MAGNUS_PATH, '')} ${chalk.gray(`${dir.DisplayName}`)}`)
+        );
       });
     }
 
@@ -47,7 +49,11 @@ export async function listFiles(directoryPath: string): Promise<void> {
     if (files.length > 0) {
       console.log(chalk.green('\nFiles:'));
       files.forEach((file) => {
-        console.log(`📄 ${chalk.green(file.Uri.replace(MAGNUS_PATH, ''))}`);
+        console.log(
+          `📄 ${chalk.green(file.Uri.replace(MAGNUS_PATH, ''))} ${chalk.gray(
+            `${file.DisplayName}`
+          )}`
+        );
       });
     }
   } catch (error) {
