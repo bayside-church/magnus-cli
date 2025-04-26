@@ -59,9 +59,11 @@ export async function listFiles(directoryPath = 'root'): Promise<RockFile[]> {
 
   const client = await createApiClient();
 
-  const endpoint = `${MAGNUS_PATH}${directoryPath}`;
+  let endpoint = directoryPath;
+  if (!directoryPath.includes(MAGNUS_PATH)) {
+    endpoint = `${MAGNUS_PATH}${directoryPath}`;
+  }
   const response: AxiosResponse<RockFile[]> = await client.get(endpoint);
-  console.log(response.headers);
   return response.data;
 }
 

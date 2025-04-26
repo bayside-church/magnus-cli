@@ -6,7 +6,7 @@ import dotenv from 'dotenv';
 import inquirer from 'inquirer';
 import { changeDirectory, getCurrentDirectory } from './commands/cd.js';
 import { listFiles } from './commands/list.js';
-import { pullFile, pullPath } from './commands/pull.js';
+import { pullPath } from './commands/pull.js';
 import { getConfig, setConfig } from './utils/config.js';
 
 dotenv.config();
@@ -97,7 +97,7 @@ program
   .action(async (path) => {
     try {
       await pullPath(path);
-      console.log(chalk.green(`Successfully pulled: ${path}`));
+      console.log(chalk.green('Pull Done 🚀'));
     } catch (error) {
       console.error(
         chalk.red(`Error pulling file: ${error instanceof Error ? error.message : String(error)}`)

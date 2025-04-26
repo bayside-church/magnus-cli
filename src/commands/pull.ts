@@ -1,9 +1,26 @@
 import fs from 'fs/promises';
-import ora from 'ora';
+import ora, { Ora } from 'ora';
 import path from 'path';
 import { getFileContent, listFiles } from '../utils/api.js';
 import { isAuthenticated } from '../utils/config.js';
 import { getCurrentDirectory } from './cd.js';
+
+async function pullEndpoint(pullPath: string, spinner: Ora): Promise<void> {
+  const items = await listFiles(pullPath);
+  for (const item of items) {
+    if (item.IsFolder) {
+      const endpointName = item.DisplayName.toLocaleLowerCase()
+        .replace(/\s+/g, '-')
+        .replace(/\[|\]/g, '');
+      const files = await listFiles(item.Uri);
+      for (const file of files) {
+        const extension = path.extname(file.Uri);
+        const fileName = `${endpointName}${extension}`;
+        await pullFile(file.Uri, spinner, fileName);
+      }
+    }
+  }
+}
 
 export async function pullPath(pullPath: string): Promise<void> {
   if (!isAuthenticated()) {
@@ -11,34 +28,39 @@ export async function pullPath(pullPath: string): Promise<void> {
   }
 
   if (!pullPath) {
-    const currentDirectory = await getCurrentDirectory();
-    console.log(currentDirectory);
-    const items = await listFiles(currentDirectory);
+    pullPath = await getCurrentDirectory();
+  }
 
+  const spinner = ora(`Pulling ${pullPath}...`).start();
+  if (pullPath.startsWith('/lavaapplication/application-endpoints/')) {
+    await pullEndpoint(pullPath, spinner);
+  } else {
+    const items = await listFiles(pullPath);
     for (const item of items) {
       if (item.IsFolder) {
-        console.log(item.DisplayName);
+        console.log(`Folder pull is not supported yet: ${item.DisplayName}`);
       } else {
-        pullFile(item.Uri);
+        await pullFile(item.Uri, spinner);
       }
     }
-
-    return;
   }
 }
 
 /**
  * Pull a file from Rock RMS and save it locally
  * @param {string} serverFilePath - Path to the file on the server
+ * @param {Ora} spinner - Ora spinner
  * @param {string | undefined} outputPath - Local path to save the file (optional)
  * @returns {Promise<void>}
  */
-export async function pullFile(serverFilePath: string, outputPath?: string): Promise<void> {
+export async function pullFile(
+  serverFilePath: string,
+  spinner: Ora,
+  outputPath?: string
+): Promise<void> {
   if (!isAuthenticated()) {
     throw new Error('Not authenticated. Run "magnus config" first.');
   }
-
-  const spinner = ora(`Pulling ${serverFilePath} from Rock RMS...`).start();
 
   try {
     // Get file content from server
