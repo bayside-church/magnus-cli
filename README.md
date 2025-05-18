@@ -83,7 +83,7 @@ Notes:
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/magnus-cli.git
+git clone https://github.com/bayside-church/magnus-cli.git
 cd magnus-cli
 
 # Install dependencies

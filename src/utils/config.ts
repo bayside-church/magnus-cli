@@ -1,5 +1,13 @@
 import Conf from 'conf';
+import dotenv from 'dotenv';
 import { Config } from '../types/index.js';
+
+dotenv.config();
+
+// Conf uses the following paths:
+// macOS: ~/Library/Preferences/MyApp-nodejs
+// Windows: %APPDATA%\MyApp-nodejs\Config (for example, C:\Users\USERNAME\AppData\Roaming\MyApp-nodejs\Config)
+// Linux: ~/.config/MyApp-nodejs (or $XDG_CONFIG_HOME/MyApp-nodejs)
 
 // Create a new instance of Conf
 const config = new Conf({
@@ -8,8 +16,8 @@ const config = new Conf({
     serverUrl: '',
     username: '',
     password: '',
-    cookie: ''
-  }
+    cookie: '',
+  },
 }) as Conf<Config>;
 
 /**
@@ -18,6 +26,11 @@ const config = new Conf({
  * @returns {any} Configuration value
  */
 export function getConfig<K extends keyof Config>(key: K): Config[K] {
+  // Check if the key exists in environment variables first
+  const envKey = `MAGNUS_${key.toUpperCase()}`;
+  if (process.env[envKey] !== undefined) {
+    return process.env[envKey] as Config[K];
+  }
   return config.get(key);
 }
 
@@ -35,28 +48,9 @@ export function setConfig<K extends keyof Config>(key: K, value: Config[K]): voi
  * @returns {boolean} True if authenticated
  */
 export function isAuthenticated(): boolean {
-  const serverUrl = config.get('serverUrl');
-  const username = config.get('username');
-  const password = config.get('password');
-  
+  const serverUrl = getConfig('serverUrl');
+  const username = getConfig('username');
+  const password = getConfig('password');
+
   return Boolean(serverUrl && username && password);
 }
-
-// Return type for getAllConfig
-interface ConfigSummary {
-  serverUrl: string;
-  username: string;
-  hasPassword: boolean;
-}
-
-/**
- * Get all configuration
- * @returns {ConfigSummary} Configuration summary
- */
-export function getAllConfig(): ConfigSummary {
-  return {
-    serverUrl: config.get('serverUrl'),
-    username: config.get('username'),
-    hasPassword: Boolean(config.get('password'))
-  };
-} 

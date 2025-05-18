@@ -1,11 +1,16 @@
 {
   "name": "magnus-cli",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Command line tool to pull and push source code files from a Rock RMS server",
   "main": "dist/index.js",
   "bin": {
     "magnus": "dist/index.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bayside-church/magnus-cli.git"
+  },
+  "homepage": "https://github.com/bayside-church/magnus-cli",
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
@@ -15,8 +20,7 @@
   },
   "keywords": [
     "rock",
-    "rockrms",
-    "cli"
+    "rockrms"
   ],
   "author": "",
   "license": "MIT",
