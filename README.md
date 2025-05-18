@@ -6,7 +6,7 @@ Like the [VSCode Magnus plugin](https://www.triumph.tech/magnus), but for the co
 
 ## Prerequisites
 
-This tool uses the same connection endpoints as the VSCode Magnus plugin, so make its setup and working using [the Magnus instructions](https://marketplace.visualstudio.com/items?itemName=TriumphTech.magnus).
+This tool uses the same connection endpoints as the VSCode Magnus plugin, so make sure its setup and working using [the Magnus instructions](https://marketplace.visualstudio.com/items?itemName=TriumphTech.magnus).
 
 ## Usage
 
@@ -23,22 +23,6 @@ You will be prompted to enter:
 - Rock RMS server URL
 - Username
 - Password
-
-### Change Directory
-
-Navigate through directories on the Rock RMS server and set your current working directory:
-
-```bash
-npx magnus-cli cd /Themes
-```
-
-This command:
-
-1. Changes your current directory on the server
-2. Stores the path in a local `.magnus` file in your current directory
-3. Lists the contents of the directory
-
-The stored directory is used as the default for the `list` command when no path is specified.
 
 ### List items from Rock RMS
 
@@ -63,6 +47,14 @@ Change the directory on the Rock RMS server:
 ```bash
 npx magnus-cli cd /lavaapplication/
 ```
+
+This command:
+
+1. Changes your current directory on the server
+2. Stores the path in a local `.magnus` file in your current directory
+3. Lists the contents of the directory
+
+The stored directory is used as the default for the `list` command when no path is specified.
 
 ### Pull a directory from Rock RMS
 
