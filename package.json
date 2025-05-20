@@ -1,6 +1,6 @@
 {
   "name": "magnus-cli",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Command line tool to pull and push source code files from a Rock RMS server",
   "main": "dist/index.js",
   "bin": {
