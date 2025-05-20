@@ -17,6 +17,7 @@ const config = new Conf({
     username: '',
     password: '',
     cookie: '',
+    token: '',
   },
 }) as Conf<Config>;
 
@@ -51,6 +52,7 @@ export function isAuthenticated(): boolean {
   const serverUrl = getConfig('serverUrl');
   const username = getConfig('username');
   const password = getConfig('password');
+  const token = getConfig('token');
 
-  return Boolean(serverUrl && username && password);
+  return Boolean(serverUrl && ((username && password) || token));
 }

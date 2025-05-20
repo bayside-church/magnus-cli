@@ -15,6 +15,18 @@ export async function createApiClient(): Promise<AxiosInstance> {
     throw new Error('Server URL not configured. Run "magnus config" first.');
   }
 
+  const token = getConfig('token');
+
+  if (token) {
+    return axios.create({
+      baseURL: serverUrl.endsWith('/') ? serverUrl : `${serverUrl}/`,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization-Token': token,
+      },
+    });
+  }
+
   const cookie = await getAuthorizationCookie(serverUrl);
   if (cookie === null) {
     throw new Error('Unable to authorize with the server.');

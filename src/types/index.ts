@@ -6,6 +6,7 @@ export interface Config {
   username: string;
   password: string;
   cookie: string;
+  token: string;
 }
 
 /**
