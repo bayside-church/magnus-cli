@@ -36,6 +36,10 @@ export async function pullPath(pullPath: string): Promise<void> {
     await pullEndpoint(pullPath, spinner);
   } else {
     const items = await listFiles(pullPath);
+    if (items.length === 0) {
+      spinner.succeed('No items found');
+      return;
+    }
     for (const item of items) {
       if (item.IsFolder) {
         console.log(`Folder pull is not supported yet: ${item.DisplayName}`);
