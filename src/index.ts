@@ -74,7 +74,7 @@ program
   });
 
 program
-  .command('list [directoryPath]')
+  .command('ls [directoryPath]')
   .description('List available items on Rock RMS server')
   .action(async (directoryPath) => {
     try {

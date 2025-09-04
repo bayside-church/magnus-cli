@@ -29,7 +29,7 @@ You will be prompted to enter:
 List files and directories on the Rock RMS server:
 
 ```bash
-❯ npx magnus-cli list
+❯ npx magnus-cli ls
 
 ✔ Found 6 items in root
 📁 /appletvapps/ Apple TV Apps
