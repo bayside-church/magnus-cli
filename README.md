@@ -105,3 +105,10 @@ pnpm dev
 # Run linter
 pnpm lint
 ```
+
+### Publish
+
+```bash
+npm version patch
+npm publish --access=public
+```
