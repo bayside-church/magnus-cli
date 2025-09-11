@@ -4,7 +4,7 @@ import ora from 'ora';
 import path from 'path';
 import { RockFile } from '../types/index.js';
 import { listFiles, MAGNUS_PATH } from '../utils/api.js';
-import { isAuthenticated } from '../utils/config.js';
+import { isAuthenticated, runConfig } from '../utils/config.js';
 
 // Local configuration file name
 const CONFIG_FILENAME = '.magnus';
@@ -87,7 +87,12 @@ function findBestMatch(searchPath: string, items: RockFile[]): RockFile | null {
  */
 export async function changeDirectory(directoryPath: string): Promise<void> {
   if (!isAuthenticated()) {
-    throw new Error('Not authenticated. Run "magnus config" first.');
+    console.log(chalk.yellow('Not authenticated. Running configuration setup...'));
+    await runConfig();
+    // Check again after configuration
+    if (!isAuthenticated()) {
+      throw new Error('Authentication failed. Please check your credentials.');
+    }
   }
 
   const spinner = ora(`Looking for directory: ${directoryPath}...`).start();

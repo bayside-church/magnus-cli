@@ -2,7 +2,7 @@ import chalk from 'chalk';
 import ora from 'ora';
 import { RockFile } from '../types/index.js';
 import { listFiles as fetchFilesList, MAGNUS_PATH } from '../utils/api.js';
-import { isAuthenticated } from '../utils/config.js';
+import { isAuthenticated, runConfig } from '../utils/config.js';
 
 /**
  * List items from Rock RMS
@@ -11,7 +11,12 @@ import { isAuthenticated } from '../utils/config.js';
  */
 export async function listFiles(directoryPath: string): Promise<void> {
   if (!isAuthenticated()) {
-    throw new Error('Not authenticated. Run "magnus config" first.');
+    console.log(chalk.yellow('Not authenticated. Running configuration setup...'));
+    await runConfig();
+    // Check again after configuration
+    if (!isAuthenticated()) {
+      throw new Error('Authentication failed. Please check your credentials.');
+    }
   }
 
   const spinner = ora(`Listing items in ${directoryPath}...`).start();

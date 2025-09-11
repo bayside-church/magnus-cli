@@ -1,8 +1,9 @@
+import chalk from 'chalk';
 import fs from 'fs/promises';
 import ora, { Ora } from 'ora';
 import path from 'path';
 import { getFileContent, listFiles } from '../utils/api.js';
-import { isAuthenticated } from '../utils/config.js';
+import { isAuthenticated, runConfig } from '../utils/config.js';
 import { getCurrentDirectory } from './cd.js';
 
 async function pullEndpoint(pullPath: string, spinner: Ora): Promise<void> {
@@ -24,14 +25,19 @@ async function pullEndpoint(pullPath: string, spinner: Ora): Promise<void> {
 
 export async function pullPath(pullPath: string): Promise<void> {
   if (!isAuthenticated()) {
-    throw new Error('Not authenticated. Run "magnus config" first.');
+    console.log(chalk.yellow('Not authenticated. Running configuration setup...'));
+    await runConfig();
+    // Check again after configuration
+    if (!isAuthenticated()) {
+      throw new Error('Authentication failed. Please check your credentials.');
+    }
   }
 
   if (!pullPath) {
     pullPath = await getCurrentDirectory();
   }
 
-  const spinner = ora(`Pulling ${pullPath}...`).start();
+  const spinner = ora(`Pulling ${pullPath}...\n`).start();
   if (pullPath.startsWith('/lavaapplication/application-endpoints/')) {
     await pullEndpoint(pullPath, spinner);
   } else {
@@ -47,6 +53,7 @@ export async function pullPath(pullPath: string): Promise<void> {
         await pullFile(item.Uri, spinner);
       }
     }
+    spinner.stop();
   }
 }
 
@@ -63,7 +70,15 @@ export async function pullFile(
   outputPath?: string
 ): Promise<void> {
   if (!isAuthenticated()) {
-    throw new Error('Not authenticated. Run "magnus config" first.');
+    spinner.stop();
+    console.log(chalk.yellow('Not authenticated. Running configuration setup...'));
+    await runConfig();
+    // Check again after configuration
+    if (!isAuthenticated()) {
+      throw new Error('Authentication failed. Please check your credentials.');
+    }
+    // Restart the spinner
+    spinner.start();
   }
 
   try {

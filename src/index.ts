@@ -3,11 +3,10 @@
 import chalk from 'chalk';
 import { program } from 'commander';
 import dotenv from 'dotenv';
-import inquirer from 'inquirer';
 import { changeDirectory, getCurrentDirectory } from './commands/cd.js';
 import { listFiles } from './commands/list.js';
 import { pullPath } from './commands/pull.js';
-import { getConfig, setConfig } from './utils/config.js';
+import { runConfig } from './utils/config.js';
 
 dotenv.config();
 
@@ -22,39 +21,7 @@ program
   .command('config')
   .description('Configure Rock RMS server connection')
   .action(async () => {
-    const answers = await inquirer.prompt([
-      {
-        type: 'input',
-        name: 'serverUrl',
-        message: 'Rock RMS server URL:',
-        default: getConfig('serverUrl') || 'https://rock.example.org',
-      },
-      {
-        type: 'input',
-        name: 'username',
-        message: 'Username:',
-        default: getConfig('username') || '',
-      },
-      {
-        type: 'password',
-        name: 'password',
-        message: 'Password:',
-        mask: '*',
-      },
-    ]);
-
-    // Process answers and set configuration values
-    if (answers.serverUrl) {
-      setConfig('serverUrl', answers.serverUrl);
-    }
-    if (answers.username) {
-      setConfig('username', answers.username);
-    }
-    if (answers.password) {
-      setConfig('password', answers.password);
-    }
-
-    console.log(chalk.green('Configuration saved successfully.'));
+    await runConfig();
   });
 
 program

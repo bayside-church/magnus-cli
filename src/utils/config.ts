@@ -1,5 +1,7 @@
+import chalk from 'chalk';
 import Conf from 'conf';
 import dotenv from 'dotenv';
+import inquirer from 'inquirer';
 import { Config } from '../types/index.js';
 
 dotenv.config();
@@ -55,4 +57,44 @@ export function isAuthenticated(): boolean {
   const token = getConfig('token');
 
   return Boolean(serverUrl && ((username && password) || token));
+}
+
+/**
+ * Run the configuration setup interactively
+ * @returns {Promise<void>}
+ */
+export async function runConfig(): Promise<void> {
+  const answers = await inquirer.prompt([
+    {
+      type: 'input',
+      name: 'serverUrl',
+      message: 'Rock RMS server URL:',
+      default: getConfig('serverUrl') || 'https://rock.example.org',
+    },
+    {
+      type: 'input',
+      name: 'username',
+      message: 'Username:',
+      default: getConfig('username') || '',
+    },
+    {
+      type: 'password',
+      name: 'password',
+      message: 'Password:',
+      mask: '*',
+    },
+  ]);
+
+  // Process answers and set configuration values
+  if (answers.serverUrl) {
+    setConfig('serverUrl', answers.serverUrl);
+  }
+  if (answers.username) {
+    setConfig('username', answers.username);
+  }
+  if (answers.password) {
+    setConfig('password', answers.password);
+  }
+
+  console.log(chalk.green('Configuration saved successfully.'));
 }
