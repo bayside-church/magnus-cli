@@ -6,15 +6,81 @@ import { getFileContent, listFiles } from '../utils/api.js';
 import { isAuthenticated, runConfig } from '../utils/config.js';
 import { changeDirectory, getCurrentDirectory } from './cd.js';
 
+// Ignore file name
+const IGNORE_FILENAME = '.magnusignore';
+
+/**
+ * Read and parse the .magnusignore file
+ * @returns {Promise<string[]>} Array of ignore patterns
+ */
+async function readIgnoreFile(): Promise<string[]> {
+  try {
+    const ignoreFilePath = path.join(process.cwd(), IGNORE_FILENAME);
+    const content = await fs.readFile(ignoreFilePath, 'utf8');
+
+    return content
+      .split('\n')
+      .map((line) => line.trim())
+      .filter((line) => line && !line.startsWith('#')); // Remove empty lines and comments
+  } catch (error) {
+    // If file doesn't exist or can't be read, return empty array
+    return [];
+  }
+}
+
+/**
+ * Check if a URI should be ignored based on ignore patterns
+ * @param {string} uri - URI to check
+ * @param {string[]} ignorePatterns - Array of ignore patterns
+ * @returns {boolean} True if URI should be ignored
+ */
+function shouldIgnoreUri(uri: string, ignorePatterns: string[]): boolean {
+  for (const pattern of ignorePatterns) {
+    // Simple pattern matching - exact match or ends with pattern
+    if (uri === pattern || uri.endsWith(pattern) || uri.includes(pattern)) {
+      return true;
+    }
+
+    // Support for wildcard patterns (basic glob-like matching)
+    if (pattern.includes('*')) {
+      const regexPattern = pattern
+        .replace(/[.*+?^${}()|[\]\\]/g, '\\$&') // Escape special regex chars
+        .replace(/\\*/g, '.*'); // Convert * to .*
+
+      const regex = new RegExp(`^${regexPattern}$`);
+      if (regex.test(uri)) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
 async function pullEndpoint(pullPath: string, spinner: Ora): Promise<void> {
+  // Read ignore patterns for endpoint pulling too
+  const ignorePatterns = await readIgnoreFile();
+
   const items = await listFiles(pullPath);
   for (const item of items) {
     if (item.IsFolder) {
+      // Check if this endpoint folder should be ignored
+      if (shouldIgnoreUri(item.Uri, ignorePatterns)) {
+        spinner.text = `Skipping ignored endpoint folder: ${item.DisplayName}`;
+        continue;
+      }
+
       const endpointName = item.DisplayName.toLocaleLowerCase()
         .replace(/\s+/g, '-')
         .replace(/\[|\]/g, '');
       const files = await listFiles(item.Uri);
       for (const file of files) {
+        // Check if this endpoint file should be ignored
+        if (shouldIgnoreUri(file.Uri, ignorePatterns)) {
+          spinner.text = `Skipping ignored endpoint file: ${file.DisplayName}`;
+          continue;
+        }
+
         const extension = path.extname(file.Uri);
         const fileName = `${endpointName}${extension}`;
         await pullFile(file.Uri, spinner, fileName);
@@ -38,6 +104,13 @@ export async function pullPath(pullPath: string): Promise<void> {
   }
 
   const spinner = ora(`Pulling ${pullPath}...\n`).start();
+
+  // Read ignore patterns from .magnusignore file
+  const ignorePatterns = await readIgnoreFile();
+  console.log('------------- ignorePatterns', ignorePatterns);
+  if (ignorePatterns.length > 0) {
+    spinner.text = `Loaded ${ignorePatterns.length} ignore pattern(s) from ${IGNORE_FILENAME}`;
+  }
   if (
     pullPath.startsWith('/lavaapplication/application-endpoints/') ||
     pullPath.startsWith(
@@ -51,8 +124,18 @@ export async function pullPath(pullPath: string): Promise<void> {
       spinner.succeed('No items found');
       return;
     }
+    let skippedCount = 0;
     for (const item of items) {
       try {
+        // Check if this item should be ignored
+        if (shouldIgnoreUri(item.Uri, ignorePatterns)) {
+          spinner.text = `Skipping ignored ${item.IsFolder ? 'folder' : 'file'}: ${
+            item.DisplayName
+          }`;
+          skippedCount++;
+          continue;
+        }
+
         if (item.IsFolder) {
           await pullFolder(item, spinner);
         } else {
@@ -70,6 +153,11 @@ export async function pullPath(pullPath: string): Promise<void> {
         // Continue with the next item instead of stopping the entire process
       }
     }
+
+    if (skippedCount > 0) {
+      console.log(chalk.yellow(`\nSkipped ${skippedCount} item(s) due to ignore patterns`));
+    }
+
     spinner.stop();
   }
 }
