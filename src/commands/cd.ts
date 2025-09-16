@@ -138,7 +138,7 @@ export async function changeDirectory(directoryPath: string): Promise<void> {
     const message =
       matchedDir.DisplayName !== directoryPath
         ? `Current directory changed to: ${targetPath} (matched "${matchedDir.DisplayName}")`
-        : `Current directory changed to: ${targetPath}`;
+        : `Current directory changed to: ${matchedDir.DisplayName}`;
 
     spinner.succeed(message);
 
